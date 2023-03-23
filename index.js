@@ -12,7 +12,6 @@ class Vec2 {
 // Define the size of each square in pixels
 const squareSize = 100;
 
-
 // Create the canvas element and set its size
 const canvas = document.createElement("canvas");
 canvas.width = squareSize * 6;
