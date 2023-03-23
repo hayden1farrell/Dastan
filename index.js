@@ -8,7 +8,7 @@ class Vec2 {
 const squareSize = 100;
 
 // Define the colors to alternate between + kotla colours 
-const colors = ["#faebd7", "#808080", "#EB212E", "#00A6CB"];
+const colors = ["#faebd7", "#808080", "#EB212E", "#00A6CB", "#22ee22"];
 
 // Create the canvas element and set its size
 const canvas = document.createElement("canvas");
@@ -23,12 +23,14 @@ blackKotla = new Vec2(3, 5);
 const ctx = canvas.getContext("2d");
 
 var piecesarr = [];
+clickedSquare = new Vec2(-1, -1);
 
 
 // Add the canvas to the page
 document.body.appendChild(canvas);
 
 function animate() {
+  getUserInput();
   redrawBoard();
   requestAnimationFrame(animate)
 } animate();
@@ -111,6 +113,22 @@ function setUpMirza(){
   }
 }
 
+function getUserInput(){
+
+  canvas.addEventListener('mousedown', (event) => {
+    if (event.button === 0) { // Check for left mouse button
+      const mouseX = event.offsetX;
+      const mouseY = event.offsetY;
+  
+      let xSquare = mouseX % squareSize;
+      let ySqaure = mouseY % squareSize;
+      // use mouseX and mouseY to do something with the mouse position
+      clickedSquare = new Vec2(xSquare, ySqaure);
+      console.log(clickedSquare);
+    };
+  })
+}
+
 function redrawBoard(){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   for (let row = 0; row < 6; row++) {
@@ -121,16 +139,15 @@ function redrawBoard(){
       
       // if kotla tile
       // Set the fill color to the appropriate color
-      if(col == whiteKotla.x && row == whiteKotla.y){
+      if(col == clickedSquare.x && row == clickedSquare.y){
+        ctx.fillStyle = colors[4];
+      }else if(col == whiteKotla.x && row == whiteKotla.y){
         ctx.fillStyle = colors[2];
       }else if (col == blackKotla.x && row == blackKotla.y){
         ctx.fillStyle = colors[3];
       }else{
         ctx.fillStyle = colors[(row + col) % 2];
       }
-
-      
-      
       // Draw the square
       ctx.fillRect(x, y, squareSize, squareSize);
       // resets the colour 
