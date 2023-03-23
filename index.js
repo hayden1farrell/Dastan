@@ -25,6 +25,10 @@ canvas.addEventListener('mousedown', function(e) {
   cursorDown(canvas, e)
 })
 
+window.addEventListener('keydown', function(e) {
+  keypressed(canvas, e)
+})
+
 // Add the canvas to the page
 document.body.appendChild(canvas);
 
@@ -38,6 +42,11 @@ class Board{
     this.whiteKotla = new Vec2(2, 0);
     this.blackKotla = new Vec2(3, 5);
     this.selectedSquare = new Vec2(-1, -1);
+  }
+
+  reset(){
+    this.selectedSquare = new Vec2(-1,-1);
+    this.SetUp();
   }
 
   SetUp(){
@@ -201,6 +210,11 @@ board = new Board(6, 6, "#faebd7", "#808080",  "#B80F0A", "#4682B4", "#11ff11");
 function cursorDown(canvas, event){
   let pos = getCursorPosition(canvas, event);
   board.TryMovePiece(pos);
+}
+
+function keypressed(canvas, event){
+  if(event.keyCode == "R".charCodeAt(0))
+    board.reset()
 }
 
 function getCursorPosition(canvas, event) {
