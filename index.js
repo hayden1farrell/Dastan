@@ -47,12 +47,13 @@ class Piece {
 //set up board
 function setUpPieces(){
   setUpPawns();
+  setUpMirza();
 }
 setUpPieces();
 
 function setUpPawns(){
   const whiteimagepawn = new Image();
-  whiteimagepawn.src = "images/piece1.png";
+  whiteimagepawn.src = "images/pieceWhite.png";
 
 // Once the image is loaded, draw it on one of the squares
   whiteimagepawn.onload = function() {
@@ -66,7 +67,7 @@ function setUpPawns(){
     piecesarr.push(new Piece(whiteimagepawn, squareSize*4, squareSize, squareSize));
 };
   const blackimagepawn = new Image();
-  blackimagepawn.src = "images/piece2.png";
+  blackimagepawn.src = "images/pieceBlack.png";
 
   // Once the image is loaded, draw it on one of the squares
   blackimagepawn.onload = function() {
@@ -79,6 +80,24 @@ function setUpPawns(){
     ctx.drawImage(blackimagepawn, squareSize*4, squareSize*4, squareSize, squareSize);
     piecesarr.push(new Piece(blackimagepawn, squareSize*4, squareSize*4, squareSize));
   };
+}
+
+function setUpMirza(){
+  const whiteMirza = new Image();
+  whiteMirza.src = "images/mirzaWhite.png";
+
+  whiteMirza.onload = function() {
+    ctx.drawImage(whiteMirza, 0, 0, squareSize, squareSize);
+    piecesarr.push(new Piece(whiteMirza, squareSize * 2, 0, squareSize));
+  }
+
+  const blackMirza = new Image();
+  blackMirza.src = "images/mirzaBlack.png";
+
+  blackMirza.onload = function() {
+    ctx.drawImage(blackMirza, 0, 0, squareSize, squareSize);
+    piecesarr.push(new Piece(blackMirza, squareSize * 3, squareSize * 5, squareSize));
+  }
 }
 
 function redrawBoard(){
