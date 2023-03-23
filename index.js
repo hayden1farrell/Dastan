@@ -120,11 +120,10 @@ function getUserInput(){
       const mouseX = event.offsetX;
       const mouseY = event.offsetY;
   
-      let xSquare = mouseX % squareSize;
-      let ySqaure = mouseY % squareSize;
+      let xSquare = Math.floor(mouseX / squareSize);
+      let ySqaure = Math.floor(mouseY / squareSize);
       // use mouseX and mouseY to do something with the mouse position
       clickedSquare = new Vec2(xSquare, ySqaure);
-      console.log(clickedSquare);
     };
   })
 }
