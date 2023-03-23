@@ -7,6 +7,6 @@ body {
 }
 
 canvas {
-    width: 40%;
-    height: 100%;
+    width: auto;
+    height: auto;
 }
