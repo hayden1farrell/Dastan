@@ -1,13 +1,23 @@
+class Vec2 {
+  constructor(x, y){
+    this.x = x;
+    this.y = y;
+  }
+}
 // Define the size of each square in pixels
 const squareSize = 100;
 
-// Define the colors to alternate between
-const colors = ["#faebd7", "#808080"];
+// Define the colors to alternate between + kotla colours 
+const colors = ["#faebd7", "#808080", "#EB212E", "#00A6CB"];
 
 // Create the canvas element and set its size
 const canvas = document.createElement("canvas");
 canvas.width = squareSize * 6;
 canvas.height = squareSize * 6;
+
+// Set kotlas
+whiteKotla = new Vec2(2, 0);
+blackKotla = new Vec2(3, 5);
 
 // Get the canvas context
 const ctx = canvas.getContext("2d");
@@ -22,6 +32,7 @@ function animate() {
   redrawBoard();
   requestAnimationFrame(animate)
 } animate();
+
 
 class Piece {
   constructor(image, drawnposx, drawnposy, size){
@@ -108,11 +119,22 @@ function redrawBoard(){
       const x = col * squareSize;
       const y = row * squareSize;
       
+      // if kotla tile
       // Set the fill color to the appropriate color
-      ctx.fillStyle = colors[(row + col) % 2];
+      if(col == whiteKotla.x && row == whiteKotla.y){
+        ctx.fillStyle = colors[2];
+      }else if (col == blackKotla.x && row == blackKotla.y){
+        ctx.fillStyle = colors[3];
+      }else{
+        ctx.fillStyle = colors[(row + col) % 2];
+      }
+
+      
       
       // Draw the square
       ctx.fillRect(x, y, squareSize, squareSize);
+      // resets the colour 
+      ctx.fillStyle = "#000000";
     }
   }
   piecesarr.forEach(p => {
