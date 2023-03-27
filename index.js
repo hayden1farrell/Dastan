@@ -9,16 +9,20 @@ class Vec2 {
   }
 
 }
+// Add the canvas to the page
+const canvas = document.getElementById("Canvas");
 // Define the size of each square in pixels
 const squareSize = 100;
 
 // Create the canvas element and set its size
-const canvas = document.createElement("canvas");
+//const canvas = document.createElement("canvas");
 canvas.width = squareSize * 6;
 canvas.height = squareSize * 6;
 
 // Get the canvas context
 const ctx = canvas.getContext("2d");
+
+let currentPlayer = 0;
 
 canvas.addEventListener('mousedown', function(e) {
   cursorDown(canvas, e)
@@ -28,8 +32,7 @@ window.addEventListener('keydown', function(e) {
   keypressed(canvas, e)
 })
 
-// Add the canvas to the page
-document.body.appendChild(canvas);
+
 
 class Board{
   constructor(rows, cols, mainColour, alternativeColour, whiteKotlaColour, blackKotlaColour, activeColour){
@@ -41,6 +44,7 @@ class Board{
     this.whiteKotla = new Vec2(2, 0);
     this.blackKotla = new Vec2(3, 5);
     this.selectedSquare = new Vec2(-1, -1);
+    this.potentailSquares = [];
   }
 
   reset(){
@@ -122,10 +126,12 @@ class Board{
     }
   }
 
-  Move(posistion){
+  Move(posistion, selectedPeice){
     let piece = this.getPiece(this.selectedSquare);
     if(piece == null) return;
     // handle all logic which may happen when a piece moves
+
+
     // need to handle score system
     if(this.containsPiece(posistion)){
       console.info("Need to implement but square contains piece");
@@ -201,7 +207,47 @@ class Piece {
       piecesarr.splice(index, 1);
     }
   }
+
+  royotShow(){
+    let temp = this.pos;
+    temp.x += 1;
+    /*
+    board.potentialSquares.push(temp);
+    temp = this.pos;
+    temp.x -= 1;
+    board.potentialSquares.push(temp);
+
+    temp = this.pos;
+    //temp = this.y += 1;
+    board.potentialSquares.push(temp);
+    temp = this.pos;
+    temp.y -= 1;
+    board.potentialSquares.push(temp);
+  }
+
+  royotCheck(targetSquare){
+    let temp = this.pos;
+    temp.x += 1;
+    //if(temp.equals(targetSquare)) return true;
+    temp = this.pos;
+    temp.x -= 1;
+    if(temp.equals(targetSqaure)) return true;
+
+    temp = this.pos;
+    //temp = this.y += 1;
+    if(temp.equals(targetSqaure)) return true;
+    
+    temp = this.pos;
+    temp.y -= 1;
+    if(temp.equals(targetSqaure)) return true;
+
+    return false;
+    */
+  }
 }
+
+var p1moves = ["ryott", "chawdikar", "cuirassier", "faujdar", "jazair"];
+var p2moves = ["ryott", "chawdikar", "cuirassier", "faujdar", "jazair"];
 
 // creates the board
 board = new Board(6, 6, "#faebd7", "#808080",  "#B80F0A", "#4682B4", "#11ff11");
@@ -212,27 +258,35 @@ function cursorDown(canvas, event){
 }
 
 function keypressed(canvas, event){
-  if(event.keyCode == "R".charCodeAt(0))
-    board.reset()
+  if(event.keyCode == "R".charCodeAt(0)){
+    board.reset();
+  }
 }
 
 function getCursorPosition(canvas, event) {
-  const rect = canvas.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
   let boardX = Math.floor(x / squareSize);
   let boardY = Math.floor(y / squareSize);
   return new Vec2(boardX, boardY)
 }
 
+function setUI(){
+  for (var i = 0; i < 5; i++){
+    document.getElementsByClassName("moveText")[i].innerHTML = p1moves[i];
+  }
+}
+
 //set up board
 function init(){
   board.SetUp();
+  setUI();
 }
 
 function animate() {
   board.draw();
-  requestAnimationFrame(animate)
+  requestAnimationFrame(animate);
 } animate();
 
 init();
