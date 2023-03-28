@@ -47,8 +47,7 @@ class Board{
     this.colours = [mainColour, alternativeColour, whiteKotlaColour, blackKotlaColour, activeColour]
     this.piecesarr = [];
     this.squareSize = squareSize;
-    this.whiteKotla = new Vec2(2, 0);
-    this.blackKotla = new Vec2(3, 5);
+    this.kotlas = [new Vec2(2, 0), new Vec2(3, 5)];
     this.selectedSquare = new Vec2(-1, -1);
     this.potentailSquares = [];
   }
@@ -62,6 +61,29 @@ class Board{
     this.setUpPawns();
     this.setUpMizras();
   }
+
+  controlsKotla(player){
+    let kotlaPos = this.kotlas[(1-player)/2];
+    let peice = board.getPiece(kotlaPos);
+
+    if(peice == null){
+      return false;
+    }  
+
+    return peice.team == player;
+  }
+
+  controlsEnemyKotla(player){
+    let kotlaPos = this.kotlas[(player+1)/2];
+    let peice = board.getPiece(kotlaPos);
+
+    if(peice == null){
+      return false;
+    }  
+
+    return peice.team == player;
+  }
+
 
   setUpPawns(){
     // null init the board
@@ -77,7 +99,7 @@ class Board{
 
     for(let xOffset = 1; xOffset <= 4; xOffset++){
       ctx.drawImage(whitePawnImage, squareSize, squareSize, squareSize, squareSize);
-      this.setSquare(xOffset, 1, new Piece(whitePawnImage, new Vec2(xOffset, 1), squareSize, 1));
+      this.setSquare(xOffset, 1, new Piece(whitePawnImage, new Vec2(xOffset, 1), squareSize, 1, "p"));
     }
 
     // Set up the black pawns
@@ -86,7 +108,7 @@ class Board{
 
     for(let xOffset = 1; xOffset <= 4; xOffset++){
       ctx.drawImage(blackPawnImage, squareSize, squareSize, squareSize, squareSize);
-      this.setSquare(xOffset, 4, new Piece(blackPawnImage, new Vec2(xOffset, 4), squareSize, -1));
+      this.setSquare(xOffset, 4, new Piece(blackPawnImage, new Vec2(xOffset, 4), squareSize, -1, "p"));
     }
 
   }
@@ -96,13 +118,13 @@ class Board{
     const whiteMizraImage = new Image();
     whiteMizraImage.src = "images/mirzaWhite.png";
     ctx.drawImage(whiteMizraImage, squareSize, squareSize, squareSize, squareSize);
-    this.setSquare(2, 0, new Piece(whiteMizraImage, new Vec2(2, 0), squareSize, 1));
+    this.setSquare(2, 0, new Piece(whiteMizraImage, new Vec2(2, 0), squareSize, 1, "m"));
 
   
     const blackMizraImage = new Image();
     blackMizraImage.src = "images/mirzaBlack.png";
     ctx.drawImage(blackMizraImage, squareSize, squareSize, squareSize, squareSize);
-    this.setSquare(3, 5, new Piece(blackMizraImage, new Vec2(3,5), squareSize, -1));
+    this.setSquare(3, 5, new Piece(blackMizraImage, new Vec2(3,5), squareSize, -1, "m"));
   }
 
   setSquare(x, y, value){
@@ -150,12 +172,18 @@ class Board{
     if(movingSqaure != null && movingSqaure.team == piece.team){
       valid = false;
     }
-
+    let gameOver = false;
     if(valid){
+      // maps 1 to 0 and -1 to 1 for indexing the players score
       let currentPlayerIndex = (1-currentPlayer)/2;
       if(this.containsPiece(posistion)){
-        // maps 1 to 0 and -1 to 1 for indexing the players score
-        scores[currentPlayerIndex] += 1;
+        if(this.getPiece(posistion).type == "m"){
+          // you have got the mirza
+          gameOver = true;
+          scores[currentPlayerIndex] += 5;
+        }else{
+          scores[currentPlayerIndex] += 1;
+        }
         this.movePiece(posistion, this.selectedSquare, piece);
 
       }else{
@@ -164,8 +192,33 @@ class Board{
       scores[currentPlayerIndex] -= mapMoveIndex(moveIndex);
 
       //check if in control of mirza
-      scores[currentPlayerIndex] += 5;
+      if(this.controlsKotla(currentPlayer)){
+        scores[currentPlayerIndex] += 5;
+      }
+      if(this.controlsEnemyKotla(currentPlayer)){
+        scores[currentPlayerIndex] += 1;
+      }
+
+      // check if mirza in enemy kotla
+      if(piece.type == "m" && piece.pos.equals(this.GetEnemyMirza())){
+        gameOver = true;
+      }
+
+      if(gameOver){
+        GameOver();
+      }
+
+      // calulate the other players score
       currentPlayer *= -1;
+      currentPlayerIndex = (1-currentPlayer)/2;
+      if(this.controlsKotla(currentPlayer)){
+        scores[currentPlayerIndex] += 5;
+      }
+      if(this.controlsEnemyKotla(currentPlayer)){
+        scores[currentPlayerIndex] += 1;
+      }
+
+
     }
 
     this.selectedSquare = new Vec2(-1, -1);
@@ -180,6 +233,10 @@ class Board{
     piece.move(newPos);
     this.setSquare(newPos.x, newPos.y, piece);
 
+  }
+
+  GetEnemyMirza(){
+    return this.kotlas[(currentPlayer+1)/2];
   }
 
   getPiece(posistion){
@@ -197,10 +254,10 @@ class Board{
         if(col == this.selectedSquare.x && row == this.selectedSquare.y){
           ctx.fillStyle = this.colours[4];
           // the current sqaure is the white kotla
-        }else if(col == this.whiteKotla.x && row == this.whiteKotla.y){
+        }else if(col == this.kotlas[0].x && row == this.kotlas[0].y){
           ctx.fillStyle = this.colours[2];
           // if the current sqaure is the black kotal
-        }else if(col == this.blackKotla.x && row == this.blackKotla.y){
+        }else if(col == this.kotlas[1].x && row == this.kotlas[1].y){
           ctx.fillStyle = this.colours[3];
         }else{
           ctx.fillStyle = this.colours[(row + col) % 2];
@@ -223,11 +280,12 @@ class Board{
 }
 
 class Piece {
-  constructor(image, drawPos, size, team){
+  constructor(image, drawPos, size, team, type){
     this.image = image;
     this.pos = drawPos;
     this.size = size;
     this.team = team;
+    this.type = type;
   }
 
   move(pos){
@@ -413,6 +471,15 @@ function setUI(){
   }
   document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
   document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
+}
+
+function GameOver(){
+  console.log("Game over");
+  if(scores[0] > scores[1]){
+    console.log("Player one has won");
+  }else{
+    console.log("Player two has won");
+  }
 }
 
 //set up board
