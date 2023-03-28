@@ -142,8 +142,13 @@ class Board{
     }
     if(selectedMove == "Faujdar"){
       valid = piece.FaujdarCheck(posistion);
+    }   
+     if(selectedMove == "Cuirassier"){
+      valid = piece.CuirassierCheck(posistion);
     }
-    
+    if(selectedMove == "Jazair"){
+      valid = piece.JazairCheck(posistion);
+    }
     //reset the peice posistion
     piece.move(this.selectedSquare);
 
@@ -228,6 +233,42 @@ class Piece {
     if (index > -1) {
       piecesarr.splice(index, 1);
     }
+  }
+
+  JazairCheck(targetSqaure){
+    let temp = this.pos
+    temp.x += 2;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x -= 4;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x += 2;
+
+    temp.y += this.team * 2;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x += 2;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x -= 4;
+    if(temp.equals(targetSqaure)) return true;
+
+    temp.x += 3;
+    temp.y -= this.team * 3;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x -= 2;
+    if(temp.equals(targetSqaure)) return true;
+  }
+
+  CuirassierCheck(targetSqaure){
+    let temp = this.pos
+    temp.y += this.team;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y += this.team;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y -= this.team * 2;
+    temp.x += 2;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x -= 4;
+    if(temp.equals(targetSqaure)) return true;
+    return false;
   }
 
   FaujdarCheck(targetSqaure){
