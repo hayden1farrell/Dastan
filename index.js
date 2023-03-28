@@ -22,8 +22,8 @@ canvas.height = squareSize * 6;
 // Get the canvas context
 const ctx = canvas.getContext("2d");
 
-let currentPlayer = 0;
-let selectedMove = "Ryott";
+let currentPlayer = 1;
+let selectedMove = "";
 
 canvas.addEventListener('mousedown', function(e) {
   cursorDown(canvas, e)
@@ -132,38 +132,30 @@ class Board{
     if(piece == null) return;
     // handle all logic which may happen when a piece moves
     let valid = false;
-    if(selectedMove == "Ryott"){
-      // handle ryott movement
-      valid = piece.ryottCheck(posistion);
-    }
-    if(selectedMove == "Chowkidar"){
-      // handle ryott movement
-      valid = piece.ChowkidarCheck(posistion);
-    }
-    if(selectedMove == "Faujdar"){
-      valid = piece.FaujdarCheck(posistion);
-    }   
-     if(selectedMove == "Cuirassier"){
-      valid = piece.CuirassierCheck(posistion);
-    }
-    if(selectedMove == "Jazair"){
-      valid = piece.JazairCheck(posistion);
+    
+    valid = piece.CheckMove(posistion);
+
+    if(piece.team != currentPlayer){
+      valid = false;
     }
     //reset the peice posistion
     piece.move(this.selectedSquare);
 
+    let movingSqaure = this.getPiece(posistion);
+    if(movingSqaure != null && movingSqaure.team == piece.team){
+      valid = false;
+    }
+
     if(valid){
       if(this.containsPiece(posistion)){
         // check the sqaure the user wants to move to does not contain friendly
-        let movingSqaure = this.getPiece(posistion);
-        if(movingSqaure != null && movingSqaure.team != piece.team){
-          console.info("Need to implement but square contains piece");
-          this.movePiece(posistion, this.selectedSquare, piece);
-        }
+        console.info("Need to implement but square contains piece");
+        this.movePiece(posistion, this.selectedSquare, piece);
 
       }else{
         this.movePiece(posistion, this.selectedSquare, piece);
       }
+      currentPlayer *= -1;
     }
 
     this.selectedSquare = new Vec2(-1, -1);
@@ -235,15 +227,32 @@ class Piece {
     }
   }
 
-  JazairCheck(targetSqaure){
-    let temp = this.pos
+  CheckMove(targetSqaure){
+    var moveCheck = {
+      "Ryott" :       this.ryottCheck,
+      "Chowkidar" :   this.ChowkidarCheck,
+      "Faujdar" :     this.FaujdarCheck,
+      "Cuirassier" :  this.CuirassierCheck,
+      "Jazair" :      this.JazairCheck,
+      "" : this.Blank,
+    };
+
+    return moveCheck[selectedMove](targetSqaure, this);
+  }
+
+  Blank(targetSqaure, self){
+    console.log("No move selected please select a move");
+  }
+
+  JazairCheck(targetSqaure, self){
+    let temp = self.pos;
     temp.x += 2;
     if(temp.equals(targetSqaure)) return true;
     temp.x -= 4;
     if(temp.equals(targetSqaure)) return true;
     temp.x += 2;
 
-    temp.y += this.team * 2;
+    temp.y += self.team * 2;
     if(temp.equals(targetSqaure)) return true;
     temp.x += 2;
     if(temp.equals(targetSqaure)) return true;
@@ -251,19 +260,19 @@ class Piece {
     if(temp.equals(targetSqaure)) return true;
 
     temp.x += 3;
-    temp.y -= this.team * 3;
+    temp.y -= self.team * 3;
     if(temp.equals(targetSqaure)) return true;
     temp.x -= 2;
     if(temp.equals(targetSqaure)) return true;
   }
 
-  CuirassierCheck(targetSqaure){
-    let temp = this.pos
-    temp.y += this.team;
+  CuirassierCheck(targetSqaure, self){
+    let temp = self.pos;
+    temp.y += self.team;
     if(temp.equals(targetSqaure)) return true;
-    temp.y += this.team;
+    temp.y += self.team;
     if(temp.equals(targetSqaure)) return true;
-    temp.y -= this.team * 2;
+    temp.y -= self.team * 2;
     temp.x += 2;
     if(temp.equals(targetSqaure)) return true;
     temp.x -= 4;
@@ -271,8 +280,8 @@ class Piece {
     return false;
   }
 
-  FaujdarCheck(targetSqaure){
-    let temp = this.pos;
+  FaujdarCheck(targetSqaure, self){
+    let temp = self.pos;
     temp.x += 1;
     if(temp.equals(targetSqaure)) return true;
     temp.x += 1;
@@ -283,8 +292,8 @@ class Piece {
     if(temp.equals(targetSqaure)) return true;
   }
 
-  ChowkidarCheck(targetSqaure){
-    let temp = this.pos;
+  ChowkidarCheck(targetSqaure, self){
+    let temp = self.pos;
     temp.x += 1; temp.y +=1;
     if(temp.equals(targetSqaure)) return true;
     temp.y -= 1; temp.x += 1;
@@ -306,8 +315,8 @@ class Piece {
     return false;
   }
 
-  ryottCheck(targetSquare){
-    let temp = this.pos;
+  ryottCheck(targetSquare, self){
+    let temp = self.pos;
     temp.x += 1;
     if(temp.equals(targetSquare)) return true;
     temp.x -= 2;
