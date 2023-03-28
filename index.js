@@ -131,7 +131,6 @@ class Board{
     let piece = this.getPiece(this.selectedSquare);
     if(piece == null) return;
     // handle all logic which may happen when a piece moves
-    console.log(selectedMove);
     let valid = false;
     if(selectedMove == "Ryott"){
       // handle ryott movement
@@ -252,35 +251,15 @@ class Piece {
     temp.y-=1; temp.x -= 1;
     if(temp.equals(targetSqaure)) return true;
 
-    //left side
-    temp = this.pos;
+    //reset posistion
+    temp.y += 1;
+    temp.x -= 1;
+
     temp.x -= 1; temp.y +=1;
     if(temp.equals(targetSqaure)) return true;
-    temp.y -= 1; temp.x -= 1;
+    temp.x -= 1; temp.y -= 1;
     if(temp.equals(targetSqaure)) return true;
-    temp.y-=1; temp.x += 1;
-    if(temp.equals(targetSqaure)) return true;
-
-    return false;
-  }
-
-
-  ChowkidarCheck(targetSqaure){
-    let temp = this.pos;
-    temp.x += 1; temp.y +=1;
-    if(temp.equals(targetSqaure)) return true;
-    temp.y -= 1; temp.x += 1;
-    if(temp.equals(targetSqaure)) return true;
-    temp.y-=1; temp.x -= 1;
-    if(temp.equals(targetSqaure)) return true;
-
-    //left side
-    temp = this.pos;
-    temp.x -= 1; temp.y +=1;
-    if(temp.equals(targetSqaure)) return true;
-    temp.y -= 1; temp.x -= 1;
-    if(temp.equals(targetSqaure)) return true;
-    temp.y-=1; temp.x += 1;
+    temp.x += 1;temp.y-=1;
     if(temp.equals(targetSqaure)) return true;
 
     return false;
@@ -294,13 +273,9 @@ class Piece {
     if(temp.equals(targetSquare)) return true;
     temp.x += 1;
     temp.y += 1;
-    console.log(temp);
     if(temp.equals(targetSquare)) return true;
     temp.y -= 2;
     if(temp.equals(targetSquare)) return true;
-
-
-    console.log("invalid move");
     return false;
   }
 }
@@ -312,10 +287,8 @@ for (var i = 0; i < elements.length; i++){
     for (var j =0; j < moves.length; j++){
       moves[j].style.backgroundColor = "#44423f";
     }
-    //selectedMove = moves[i].innerHTML;
+    selectedMove = this.textContent;
     this.style.backgroundColor = "#687c4d";
-    console.log(selectedMove);
-
 });
 }
 
@@ -332,6 +305,14 @@ function cursorDown(canvas, event){
 
 function keypressed(canvas, event){
   if(event.keyCode == "R".charCodeAt(0)){
+    for (var i = 0; i < elements.length; i++){
+      var moves = document.getElementsByClassName("moveBlock");
+      for (var j =0; j < moves.length; j++){
+        moves[j].style.backgroundColor = "#44423f";
+      }
+    };
+    
+    selectedMove = "";
     board.reset();
   }
 }
