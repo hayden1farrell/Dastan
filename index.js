@@ -23,6 +23,7 @@ canvas.height = squareSize * 6;
 const ctx = canvas.getContext("2d");
 
 let currentPlayer = 0;
+let selectedMove = "Ryott";
 
 canvas.addEventListener('mousedown', function(e) {
   cursorDown(canvas, e)
@@ -130,17 +131,33 @@ class Board{
     let piece = this.getPiece(this.selectedSquare);
     if(piece == null) return;
     // handle all logic which may happen when a piece moves
-
-
-    // need to handle score system
-    if(this.containsPiece(posistion)){
-      console.info("Need to implement but square contains piece");
-      this.movePiece(posistion, this.selectedSquare, piece);
-      this.selectedSquare = new Vec2(-1, -1);
-    }else{
-      this.movePiece(posistion, this.selectedSquare, piece);
-      this.selectedSquare = new Vec2(-1, -1);
+    console.log(selectedMove);
+    let valid = false;
+    if(selectedMove == "Ryott"){
+      // handle ryott movement
+      valid = piece.ryottCheck(posistion);
     }
+    if(selectedMove == "Chowkidar"){
+      // handle ryott movement
+      valid = piece.ChowkidarCheck(posistion);
+    }
+    if(selectedMove == "Faujdar"){
+      valid = piece.FaujdarCheck(posistion);
+    }
+    
+    //reset the peice posistion
+    piece.move(posistion);
+
+    if(valid){
+      if(this.containsPiece(posistion)){
+        console.info("Need to implement but square contains piece");
+        this.movePiece(posistion, this.selectedSquare, piece);
+      }else{
+        this.movePiece(posistion, this.selectedSquare, piece);
+      }
+    }
+
+    this.selectedSquare = new Vec2(-1, -1);
   }
 
   movePiece(newPos, oldPos, piece){
@@ -208,46 +225,97 @@ class Piece {
     }
   }
 
-  royotShow(){
+  FaujdarCheck(targetSqaure){
     let temp = this.pos;
     temp.x += 1;
-    /*
-    board.potentialSquares.push(temp);
-    temp = this.pos;
-    temp.x -= 1;
-    board.potentialSquares.push(temp);
-
-    temp = this.pos;
-    //temp = this.y += 1;
-    board.potentialSquares.push(temp);
-    temp = this.pos;
-    temp.y -= 1;
-    board.potentialSquares.push(temp);
+    if(temp.equals(targetSqaure)) return true;
+    temp.x += 1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x -= 4;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x += 1;
+    if(temp.equals(targetSqaure)) return true;
   }
 
-  royotCheck(targetSquare){
+  ChowkidarCheck(targetSqaure){
     let temp = this.pos;
-    temp.x += 1;
-    //if(temp.equals(targetSquare)) return true;
-    temp = this.pos;
-    temp.x -= 1;
+    temp.x += 1; temp.y +=1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y -= 1; temp.x += 1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y-=1; temp.x -= 1;
     if(temp.equals(targetSqaure)) return true;
 
+    //left side
     temp = this.pos;
-    //temp = this.y += 1;
+    temp.x -= 1; temp.y +=1;
     if(temp.equals(targetSqaure)) return true;
-    
-    temp = this.pos;
-    temp.y -= 1;
+    temp.y -= 1; temp.x -= 1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y-=1; temp.x += 1;
     if(temp.equals(targetSqaure)) return true;
 
     return false;
-    */
+  }
+
+
+  ChowkidarCheck(targetSqaure){
+    let temp = this.pos;
+    temp.x += 1; temp.y +=1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y -= 1; temp.x += 1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y-=1; temp.x -= 1;
+    if(temp.equals(targetSqaure)) return true;
+
+    //left side
+    temp = this.pos;
+    temp.x -= 1; temp.y +=1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y -= 1; temp.x -= 1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.y-=1; temp.x += 1;
+    if(temp.equals(targetSqaure)) return true;
+
+    return false;
+  }
+
+  ryottCheck(targetSquare){
+    let temp = this.pos;
+    temp.x += 1;
+    if(temp.equals(targetSquare)) return true;
+    temp.x -= 2;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x += 2;
+    temp = this.y += 1;
+    if(temp.equals(targetSqaure)) return true;
+    
+    temp = this.pos;
+    temp.y -= 2;
+    if(temp.equals(targetSqaure)) return true;
+
+
+    console.log("invalid move");
+    return false;
   }
 }
+var elements = document.getElementsByClassName("moveBlock");
 
-var p1moves = ["ryott", "chawdikar", "cuirassier", "faujdar", "jazair"];
-var p2moves = ["ryott", "chawdikar", "cuirassier", "faujdar", "jazair"];
+for (var i = 0; i < elements.length; i++){
+  elements[i].addEventListener('mousedown', function(){
+    var moves = document.getElementsByClassName("moveBlock");
+    for (var j =0; j < moves.length; j++){
+      moves[j].style.backgroundColor = "#44423f";
+    }
+    //selectedMove = moves[i].innerHTML;
+    this.style.backgroundColor = "#687c4d";
+    console.log(selectedMove);
+
+});
+}
+
+var p1moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
+var p2moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
 
 // creates the board
 board = new Board(6, 6, "#faebd7", "#808080",  "#B80F0A", "#4682B4", "#11ff11");
