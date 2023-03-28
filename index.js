@@ -22,8 +22,13 @@ canvas.height = squareSize * 6;
 // Get the canvas context
 const ctx = canvas.getContext("2d");
 
+let scores = [100,100];
 let currentPlayer = 1;
 let selectedMove = "";
+let moveIndex = 0;
+
+var p1moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
+var p2moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
 
 canvas.addEventListener('mousedown', function(e) {
   cursorDown(canvas, e)
@@ -147,18 +152,27 @@ class Board{
     }
 
     if(valid){
+      let currentPlayerIndex = (1-currentPlayer)/2;
       if(this.containsPiece(posistion)){
-        // check the sqaure the user wants to move to does not contain friendly
-        console.info("Need to implement but square contains piece");
+        // maps 1 to 0 and -1 to 1 for indexing the players score
+        scores[currentPlayerIndex] += 1;
         this.movePiece(posistion, this.selectedSquare, piece);
 
       }else{
         this.movePiece(posistion, this.selectedSquare, piece);
       }
+      scores[currentPlayerIndex] -= mapMoveIndex(moveIndex);
+
+      //check if in control of mirza
+      scores[currentPlayerIndex] += 5;
       currentPlayer *= -1;
     }
 
     this.selectedSquare = new Vec2(-1, -1);
+
+    // Update score UI
+    document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
+    document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
   }
 
   movePiece(newPos, oldPos, piece){
@@ -331,6 +345,7 @@ class Piece {
 }
 var elements = document.getElementsByClassName("moveBlock");
 
+
 for (var i = 0; i < elements.length; i++){
   elements[i].addEventListener('mousedown', function(){
     var moves = document.getElementsByClassName("moveBlock");
@@ -338,12 +353,28 @@ for (var i = 0; i < elements.length; i++){
       moves[j].style.backgroundColor = "#44423f";
     }
     selectedMove = this.textContent;
+    if(currentPlayer == 1){
+      moveIndex = p1moves.indexOf(selectedMove);
+    }else{
+      moveIndex = p2moves.indexOf(selectedMove);
+    }
+
     this.style.backgroundColor = "#687c4d";
 });
 }
 
-var p1moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
-var p2moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
+function mapMoveIndex(x){
+  if (x === 0) {
+    return 1;
+  } else if (x === 1) {
+    return 5;
+  } else if (x === 2) {
+    return 7;
+  } else {
+    return x;
+  }
+}
+
 
 // creates the board
 board = new Board(6, 6, "#faebd7", "#808080",  "#B80F0A", "#4682B4", "#11ff11");
@@ -380,6 +411,8 @@ function setUI(){
   for (var i = 0; i < 5; i++){
     document.getElementsByClassName("moveText")[i].innerHTML = p1moves[i];
   }
+  document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
+  document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
 }
 
 //set up board
