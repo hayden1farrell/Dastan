@@ -72,7 +72,7 @@ class Board{
 
     for(let xOffset = 1; xOffset <= 4; xOffset++){
       ctx.drawImage(whitePawnImage, squareSize, squareSize, squareSize, squareSize);
-      this.setSquare(xOffset, 1, new Piece(whitePawnImage, new Vec2(xOffset, 1), squareSize));
+      this.setSquare(xOffset, 1, new Piece(whitePawnImage, new Vec2(xOffset, 1), squareSize, 1));
     }
 
     // Set up the black pawns
@@ -81,7 +81,7 @@ class Board{
 
     for(let xOffset = 1; xOffset <= 4; xOffset++){
       ctx.drawImage(blackPawnImage, squareSize, squareSize, squareSize, squareSize);
-      this.setSquare(xOffset, 4, new Piece(blackPawnImage, new Vec2(xOffset, 4), squareSize));
+      this.setSquare(xOffset, 4, new Piece(blackPawnImage, new Vec2(xOffset, 4), squareSize, -1));
     }
 
   }
@@ -91,13 +91,13 @@ class Board{
     const whiteMizraImage = new Image();
     whiteMizraImage.src = "images/mirzaWhite.png";
     ctx.drawImage(whiteMizraImage, squareSize, squareSize, squareSize, squareSize);
-    this.setSquare(2, 0, new Piece(whiteMizraImage, new Vec2(2, 0), squareSize));
+    this.setSquare(2, 0, new Piece(whiteMizraImage, new Vec2(2, 0), squareSize, 1));
 
   
     const blackMizraImage = new Image();
     blackMizraImage.src = "images/mirzaBlack.png";
     ctx.drawImage(blackMizraImage, squareSize, squareSize, squareSize, squareSize);
-    this.setSquare(3, 5, new Piece(blackMizraImage, new Vec2(3,5), squareSize));
+    this.setSquare(3, 5, new Piece(blackMizraImage, new Vec2(3,5), squareSize, -1));
   }
 
   setSquare(x, y, value){
@@ -146,12 +146,17 @@ class Board{
     }
     
     //reset the peice posistion
-    piece.move(posistion);
+    piece.move(this.selectedSquare);
 
     if(valid){
       if(this.containsPiece(posistion)){
-        console.info("Need to implement but square contains piece");
-        this.movePiece(posistion, this.selectedSquare, piece);
+        // check the sqaure the user wants to move to does not contain friendly
+        let movingSqaure = this.getPiece(posistion);
+        if(movingSqaure != null && movingSqaure.team != piece.team){
+          console.info("Need to implement but square contains piece");
+          this.movePiece(posistion, this.selectedSquare, piece);
+        }
+
       }else{
         this.movePiece(posistion, this.selectedSquare, piece);
       }
@@ -208,10 +213,11 @@ class Board{
 }
 
 class Piece {
-  constructor(image, drawPos, size){
+  constructor(image, drawPos, size, team){
     this.image = image;
     this.pos = drawPos;
     this.size = size;
+    this.team = team;
   }
 
   move(pos){
@@ -285,14 +291,13 @@ class Piece {
     temp.x += 1;
     if(temp.equals(targetSquare)) return true;
     temp.x -= 2;
-    if(temp.equals(targetSqaure)) return true;
-    temp.x += 2;
-    temp = this.y += 1;
-    if(temp.equals(targetSqaure)) return true;
-    
-    temp = this.pos;
+    if(temp.equals(targetSquare)) return true;
+    temp.x += 1;
+    temp.y += 1;
+    console.log(temp);
+    if(temp.equals(targetSquare)) return true;
     temp.y -= 2;
-    if(temp.equals(targetSqaure)) return true;
+    if(temp.equals(targetSquare)) return true;
 
 
     console.log("invalid move");
