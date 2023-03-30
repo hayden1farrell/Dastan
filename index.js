@@ -240,16 +240,16 @@ class Board{
       if(this.controlsEnemyKotla(currentPlayer)){
         scores[currentPlayerIndex] += 1;
       }
+      selectedMove = "";
+      makeAllSquaresBlank();
+  
+      this.selectedSquare = new Vec2(-1, -1);
+  
+      // Update score UI
+      document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
+      document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
     }
 
-    selectedMove = "";
-    makeAllSquaresBlank();
-
-    this.selectedSquare = new Vec2(-1, -1);
-
-    // Update score UI
-    document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
-    document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
 
     if (!gamecommencing){
       gameOver();
@@ -296,9 +296,11 @@ class Board{
         ctx.fillStyle = "#000000";
       }
     }
-    if(this.getPiece(selectedMove) != null){
-      console.log("board circle");
-      this.DisplayValidMoves();
+    if(this.selectedSquare.equals(new Vec2(-1, -1)) == false && selectedMove != ""){
+      let piece = this.getPiece(this.selectedSquare);
+      if(piece != null){
+        this.DisplayValidMoves(this.selectedSquare);
+      }
     }
   }
 
@@ -308,11 +310,6 @@ class Board{
         ctx.drawImage(p.image, p.pos.x * squareSize, p.pos.y * squareSize, p.size, p.size);
       }
     });
-
-    if(this.getPiece(selectedMove) != null){
-      console.log("tsetes");
-      this.DisplayValidMoves();
-    }
   }
 
 }
@@ -331,24 +328,28 @@ class Piece {
   }
 
   take(){
-    let index = piecesarr.indexOf(this);
+    var index = piecesarr.indexOf(this);
     if (index > -1) {
       piecesarr.splice(index, 1);
     }
   }
 
   showValid(){
-    console.log("Test");
     if(selectedMove == "Ryott"){
-      console.log("ryott");
-
       this.ryottShow(this);
+    } else if(selectedMove == "Chowkidar"){
+      this.ChowkidarShow(this);
+    } else if(selectedMove == "Cuirassier"){
+      this.CuirassierShow(this);
+    }else if(selectedMove == "Faujdar"){
+      this.FaujdarShow(this);
+    }else if(selectedMove == "Jazair"){
+      this.JazairShow(this);
     }
-
   }
 
   CheckMove(targetSqaure){
-    let moveCheck = {
+    var moveCheck = {
       "Ryott" :       this.ryottCheck,
       "Chowkidar" :   this.ChowkidarCheck,
       "Faujdar" :     this.FaujdarCheck,
@@ -364,12 +365,33 @@ class Piece {
     console.log("No move selected please select a move");
   }
 
+  JazairShow(self){
+    let temp = self.pos;
+    temp.x += 2;
+    self.tryDrawCircle(temp,self);
+    temp.x -= 4;
+    self.tryDrawCircle(temp,self);
+    temp.x += 2;
+
+    temp.y += self.team * 2;
+    self.tryDrawCircle(temp,self);
+    temp.x += 2;
+    self.tryDrawCircle(temp,self);
+    temp.x -= 4;
+    self.tryDrawCircle(temp,self);
+
+    temp.x += 3;
+    temp.y -= self.team * 3;
+    self.tryDrawCircle(temp,self);
+    temp.x -= 2;
+    self.tryDrawCircle(temp,self);
+    temp.x+=1;
+    temp.y += self.team;
+  }
   
 
   JazairCheck(targetSqaure, self){
-    let temp = self.pos;ctx.beginPath();
-    ctx.arc(100, 75, 50, 0, 2 * Math.PI);
-    ctx.stroke(); 
+    let temp = self.pos;
     temp.x += 2;
     if(temp.equals(targetSqaure)) return true;
     temp.x -= 4;
@@ -390,6 +412,22 @@ class Piece {
     if(temp.equals(targetSqaure)) return true;
   }
 
+  CuirassierShow(self){
+    let temp = self.pos;
+    temp.y += self.team;
+    self.tryDrawCircle(temp,self);
+    temp.y += self.team;
+    self.tryDrawCircle(temp,self);
+    temp.y -= self.team;
+    temp.x += 2;
+    self.tryDrawCircle(temp,self);
+    temp.x -= 4;
+    self.tryDrawCircle(temp,self);
+
+    temp.x+=2;
+    temp.y -= self.team;
+  }
+
   CuirassierCheck(targetSqaure, self){
     let temp = self.pos;
     temp.y += self.team;
@@ -407,13 +445,14 @@ class Piece {
   FaujdarShow(self){
     let temp = self.pos;
     temp.x += 1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.x += 1;
-    if(temp.equals(targetSqaure)) return true;
+    self.tryDrawCircle(temp,self);
     temp.x -= 4;
-    if(temp.equals(targetSqaure)) return true;
+    self.tryDrawCircle(temp,self);
     temp.x += 1;
-    if(temp.equals(targetSqaure)) return true;
+    self.tryDrawCircle(temp,self);
+    temp.x+=1;
   }
 
   FaujdarCheck(targetSqaure, self){
@@ -432,22 +471,24 @@ class Piece {
     let temp = self.pos;
     temp.x += 1; temp.y +=1;
     
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.y -= 1; temp.x += 1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.y-=1; temp.x -= 1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
 
     //reset posistion
     temp.y += 1;
     temp.x -= 1;
 
     temp.x -= 1; temp.y +=1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.x -= 1; temp.y -= 1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.x += 1;temp.y-=1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
+    temp.y += 1;
+    temp.x += 1;
   }
 
   
@@ -477,15 +518,25 @@ class Piece {
   ryottShow(self){
     let temp = self.pos;
     temp.x += 1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.x -= 2;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.x += 1;
     temp.y += 1;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.y -= 2;
-    DrawCirlce(temp.x, temp.y, 50);
+    self.tryDrawCircle(temp,self);
     temp.y += 1;
+  }
+
+  tryDrawCircle(square, self){
+    if(board.getPiece(square) == null){
+      DrawCirlce(square.x, square.y, 25);
+    }else{
+      if(board.getPiece(square).team != this.team){
+        DrawCirlce(square.x, square.y, 25);
+      }
+    }
   }
   
   ryottCheck(targetSquare, self){
@@ -502,6 +553,8 @@ class Piece {
     return false;
   }
 }
+
+
 let elements = document.getElementsByClassName("moveBlock");
 for (let i = 0; i < elements.length; i++){
   elements[i].addEventListener('mousedown', function(){
@@ -680,9 +733,8 @@ function gameOver(){
 
 function DrawCirlce(x, y, radius){
   ctx.beginPath();
-  console.log(x * squareSize, y * squareSize, radius);
-  ctx.arc(x * squareSize, y * squareSize, radius , 0, 2 * Math.PI, false);
-  ctx.fillStyle = "blue"; 
+  ctx.arc((x * squareSize) + squareSize / 2, (y * squareSize) + squareSize / 2, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = "#d3d3d3";
   ctx.fill(); 
 }
 
