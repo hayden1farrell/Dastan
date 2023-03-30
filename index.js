@@ -27,9 +27,9 @@ let currentPlayer = 1;
 let selectedMove = "";
 let moveIndex = 0;
 
-var p1moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
-var p2moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
-var selectedoffer = false;
+let p1moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
+let p2moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
+let selectedoffer = false;
 
 canvas.addEventListener('mousedown', function(e) {
   cursorDown(canvas, e);
@@ -55,6 +55,7 @@ class Board{
   reset(){
     this.selectedSquare = new Vec2(-1,-1);
     this.SetUp();
+    scores = [100, 100];
   }
 
   SetUp(){
@@ -164,6 +165,7 @@ class Board{
   }
 
   Move(posistion, selectedPeice){
+    let gamecommencing = true;
     let piece = this.getPiece(this.selectedSquare);
     if(piece == null) return;
     // handle all logic which may happen when a piece moves
@@ -181,19 +183,21 @@ class Board{
     if(movingSqaure != null && movingSqaure.team == piece.team){
       valid = false;
     }
-    let gameOver = false;
     if(valid){
       // maps 1 to 0 and -1 to 1 for indexing the players score
       let currentPlayerIndex = (1-currentPlayer)/2;
       if(this.containsPiece(posistion)){
+        
         if(this.getPiece(posistion).type == "m"){
           // you have got the mirza
-          gameOver = true;
           scores[currentPlayerIndex] += 5;
+          gamecommencing = false;
+
         }else{
           scores[currentPlayerIndex] += 1;
         }
         this.movePiece(posistion, this.selectedSquare, piece);
+        
 
       }else{
         this.movePiece(posistion, this.selectedSquare, piece);
@@ -209,13 +213,13 @@ class Board{
       }
 
       // check if mirza in enemy kotla
-      if(piece.type == "m" && piece.pos.equals(this.GetEnemyMirza())){
+      /*if(piece.type == "m" && piece.pos.equals(this.GetEnemyMirza())){
         gameOver = true;
       }
 
       if(gameOver){
-        GameOver();
-      }
+        gameOver();
+      }*/
       // changes the moves
 
       if (currentPlayer == 1){
@@ -246,6 +250,10 @@ class Board{
     // Update score UI
     document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
     document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
+
+    if (!gamecommencing){
+      gameOver();
+    }
   }
 
   movePiece(newPos, oldPos, piece){
@@ -323,7 +331,7 @@ class Piece {
   }
 
   take(){
-    var index = piecesarr.indexOf(this);
+    let index = piecesarr.indexOf(this);
     if (index > -1) {
       piecesarr.splice(index, 1);
     }
@@ -340,7 +348,7 @@ class Piece {
   }
 
   CheckMove(targetSqaure){
-    var moveCheck = {
+    let moveCheck = {
       "Ryott" :       this.ryottCheck,
       "Chowkidar" :   this.ChowkidarCheck,
       "Faujdar" :     this.FaujdarCheck,
@@ -494,8 +502,8 @@ class Piece {
     return false;
   }
 }
-var elements = document.getElementsByClassName("moveBlock");
-for (var i = 0; i < elements.length; i++){
+let elements = document.getElementsByClassName("moveBlock");
+for (let i = 0; i < elements.length; i++){
   elements[i].addEventListener('mousedown', function(){
     if (selectedoffer){
       this.childNodes[0].innerHTML = document.getElementById("offer").title;
@@ -508,8 +516,8 @@ for (var i = 0; i < elements.length; i++){
       document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
       updateOffer();
     } else if (this.title != "4" && this.title != "5") {
-      var moves = document.getElementsByClassName("moveBlock");
-      for (var j =0; j < moves.length; j++){
+      let moves = document.getElementsByClassName("moveBlock");
+      for (let j =0; j < moves.length; j++){
         moves[j].style.backgroundColor = "#44423f";
       }
       selectedMove = this.textContent;
@@ -526,8 +534,8 @@ for (var i = 0; i < elements.length; i++){
 }
 
 function makeAllSquaresBlank(){
-  var moves = document.getElementsByClassName("moveBlock");
-      for (var j =0; j < moves.length; j++){
+  let moves = document.getElementsByClassName("moveBlock");
+      for (let j =0; j < moves.length; j++){
         moves[j].style.backgroundColor = "#44423f";
       }
 }
@@ -537,7 +545,7 @@ document.getElementById("offer").addEventListener('mousedown', function(){
 });
 
 function updatePlayerText(player){
-  var el = document.getElementById("currentplayer");
+  let el = document.getElementById("currentplayer");
   if (player == 1){
     el.innerHTML = "Current Player: P1";
     el.style.color = "red";
@@ -549,11 +557,11 @@ function updatePlayerText(player){
 
 function changeMoveOrderP1(move){
   //console.log(move);
-  for (var i=0; i < 5; i++){
+  for (let i=0; i < 5; i++){
     if (p1moves[i] == move){
       console.log(scores);
-      var temp = p1moves[i];
-      for (var j = 0; i+j < 4; j++){
+      let temp = p1moves[i];
+      for (let j = 0; i+j < 4; j++){
         //moves[i+j].innerHTML = moves[i+j+1].innerHTML;
         p1moves[i+j] = p1moves[i+j+1];
       }
@@ -567,11 +575,11 @@ function changeMoveOrderP1(move){
 
 function changeMoveOrderP2(move){
   //console.log(move);
-  for (var i=0; i < 5; i++){
+  for (let i=0; i < 5; i++){
     if (p2moves[i] == move){
       console.log(scores);
-      var temp = p2moves[i];
-      for (var j = 0; i+j < 4; j++){
+      let temp = p2moves[i];
+      for (let j = 0; i+j < 4; j++){
         p2moves[i+j] = p2moves[i+j+1];
       }
       p2moves[4] = temp;
@@ -604,20 +612,21 @@ function cursorDown(canvas, event){
 
 function keypressed(canvas, event){
   if(event.keyCode == "R".charCodeAt(0)){
-    for (var i = 0; i < elements.length; i++){
-      var moves = document.getElementsByClassName("moveBlock");
-      for (var j =0; j < moves.length; j++){
+    for (let i = 0; i < elements.length; i++){
+      let moves = document.getElementsByClassName("moveBlock");
+      for (let j =0; j < moves.length; j++){
         moves[j].style.backgroundColor = "#44423f";
       }
     };
     
     selectedMove = "";
     board.reset();
+    scores = [100, 100];
   }
 }
 
 function updateOffer(){
-  var offerblock = document.getElementById("offer");
+  let offerblock = document.getElementById("offer");
   offerblock.title = p1moves[Math.floor(Math.random()*5)];
   offerblock.innerHTML = "Offer: "+offerblock.title;
   selectedoffer = false;
@@ -633,7 +642,7 @@ function getCursorPosition(canvas, event) {
 }
 
 function setUI(){
-  for (var i = 0; i < 5; i++){
+  for (let i = 0; i < 5; i++){
     document.getElementsByClassName("moveText")[i].innerHTML = p1moves[i];
   }
   document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
@@ -656,13 +665,17 @@ function updateMoveBlocks(){
   }
 }
 
-function GameOver(){
+function gameOver(){
   console.log("Game over");
+  alert("Game over");
   if(scores[0] > scores[1]){
     console.log("Player one has won");
+    alert("Player 1 has won!");
   }else{
     console.log("Player two has won");
+    alert("Player 2 has won");
   }
+  board.reset();
 }
 
 function DrawCirlce(x, y, radius){
