@@ -31,6 +31,9 @@ canvas {
     border-top-right-radius: 5px;
     border-bottom-right-radius: 5px;
 }
+#currentplayer{
+    color:red;
+}
 .moveBlock{
     height: 120px;
     width: 200px;
@@ -90,11 +93,11 @@ p{
     margin-left: auto;
     margin-right: auto;
     font-size: 18px;
-    color: rgb(128, 11, 190);
+    color: rgb(214, 28, 201);
     transition: .1s;
     height: 100px;
 }
 #offer:hover{
-    color: rgb(204, 18, 204);
+    color: rgb(227, 94, 227);
     transition: .1s;
 }

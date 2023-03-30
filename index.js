@@ -29,15 +29,15 @@ let moveIndex = 0;
 
 var p1moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
 var p2moves = ["Ryott", "Chowkidar", "Cuirassier", "Faujdar", "Jazair"];
+var selectedoffer = false;
 
 canvas.addEventListener('mousedown', function(e) {
-  cursorDown(canvas, e)
+  cursorDown(canvas, e);
 })
 
 window.addEventListener('keydown', function(e) {
-  keypressed(canvas, e)
+  keypressed(canvas, e);
 })
-
 
 
 class Board{
@@ -149,9 +149,18 @@ class Board{
       this.selectedSquare = new Vec2(-1, -1);
     }else{
       if(this.containsPiece(square)){
+        // means that this square has a peice and that no previous peice selected
         this.selectedSquare = square;
+
+        // display valid moves;
+        this.DisplayValidMoves(square);
       }
     }
+  }
+
+  DisplayValidMoves(square){
+    let peice = this.getPiece(square);
+    peice.showValid();
   }
 
   Move(posistion, selectedPeice){
@@ -207,9 +216,19 @@ class Board{
       if(gameOver){
         GameOver();
       }
+      // changes the moves
+
+      if (currentPlayer == 1){
+        changeMoveOrderP1(selectedMove);
+        
+      } else if (currentPlayer == -1){
+        changeMoveOrderP2(selectedMove);
+      }
 
       // calulate the other players score
       currentPlayer *= -1;
+      updateMoveBlocks();
+      updatePlayerText(currentPlayer);
       currentPlayerIndex = (1-currentPlayer)/2;
       if(this.controlsKotla(currentPlayer)){
         scores[currentPlayerIndex] += 5;
@@ -217,9 +236,10 @@ class Board{
       if(this.controlsEnemyKotla(currentPlayer)){
         scores[currentPlayerIndex] += 1;
       }
-
-
     }
+
+    selectedMove = "";
+    makeAllSquaresBlank();
 
     this.selectedSquare = new Vec2(-1, -1);
 
@@ -232,7 +252,7 @@ class Board{
     this.setSquare(oldPos.x, oldPos.y, null);
     piece.move(newPos);
     this.setSquare(newPos.x, newPos.y, piece);
-
+    
   }
 
   GetEnemyMirza(){
@@ -268,6 +288,10 @@ class Board{
         ctx.fillStyle = "#000000";
       }
     }
+    if(this.getPiece(selectedMove) != null){
+      console.log("board circle");
+      this.DisplayValidMoves();
+    }
   }
 
   drawPieces() {
@@ -276,7 +300,13 @@ class Board{
         ctx.drawImage(p.image, p.pos.x * squareSize, p.pos.y * squareSize, p.size, p.size);
       }
     });
+
+    if(this.getPiece(selectedMove) != null){
+      console.log("tsetes");
+      this.DisplayValidMoves();
+    }
   }
+
 }
 
 class Piece {
@@ -299,6 +329,16 @@ class Piece {
     }
   }
 
+  showValid(){
+    console.log("Test");
+    if(selectedMove == "Ryott"){
+      console.log("ryott");
+
+      this.ryottShow(this);
+    }
+
+  }
+
   CheckMove(targetSqaure){
     var moveCheck = {
       "Ryott" :       this.ryottCheck,
@@ -316,8 +356,12 @@ class Piece {
     console.log("No move selected please select a move");
   }
 
+  
+
   JazairCheck(targetSqaure, self){
-    let temp = self.pos;
+    let temp = self.pos;ctx.beginPath();
+    ctx.arc(100, 75, 50, 0, 2 * Math.PI);
+    ctx.stroke(); 
     temp.x += 2;
     if(temp.equals(targetSqaure)) return true;
     temp.x -= 4;
@@ -344,12 +388,24 @@ class Piece {
     if(temp.equals(targetSqaure)) return true;
     temp.y += self.team;
     if(temp.equals(targetSqaure)) return true;
-    temp.y -= self.team * 2;
+    temp.y -= self.team * 1;
     temp.x += 2;
     if(temp.equals(targetSqaure)) return true;
     temp.x -= 4;
     if(temp.equals(targetSqaure)) return true;
     return false;
+  }
+
+  FaujdarShow(self){
+    let temp = self.pos;
+    temp.x += 1;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.x += 1;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x -= 4;
+    if(temp.equals(targetSqaure)) return true;
+    temp.x += 1;
+    if(temp.equals(targetSqaure)) return true;
   }
 
   FaujdarCheck(targetSqaure, self){
@@ -364,6 +420,29 @@ class Piece {
     if(temp.equals(targetSqaure)) return true;
   }
 
+  ChowkidarShow(self){
+    let temp = self.pos;
+    temp.x += 1; temp.y +=1;
+    
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.y -= 1; temp.x += 1;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.y-=1; temp.x -= 1;
+    DrawCirlce(temp.x, temp.y, 50);
+
+    //reset posistion
+    temp.y += 1;
+    temp.x -= 1;
+
+    temp.x -= 1; temp.y +=1;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.x -= 1; temp.y -= 1;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.x += 1;temp.y-=1;
+    DrawCirlce(temp.x, temp.y, 50);
+  }
+
+  
   ChowkidarCheck(targetSqaure, self){
     let temp = self.pos;
     temp.x += 1; temp.y +=1;
@@ -387,6 +466,20 @@ class Piece {
     return false;
   }
 
+  ryottShow(self){
+    let temp = self.pos;
+    temp.x += 1;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.x -= 2;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.x += 1;
+    temp.y += 1;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.y -= 2;
+    DrawCirlce(temp.x, temp.y, 50);
+    temp.y += 1;
+  }
+  
   ryottCheck(targetSquare, self){
     let temp = self.pos;
     temp.x += 1;
@@ -402,23 +495,90 @@ class Piece {
   }
 }
 var elements = document.getElementsByClassName("moveBlock");
-
-
 for (var i = 0; i < elements.length; i++){
   elements[i].addEventListener('mousedown', function(){
-    var moves = document.getElementsByClassName("moveBlock");
-    for (var j =0; j < moves.length; j++){
-      moves[j].style.backgroundColor = "#44423f";
+    if (selectedoffer){
+      this.childNodes[0].innerHTML = document.getElementById("offer").title;
+      if (currentplayer == 1){
+        scores[0] -= this.title;
+      } else{
+        scores[1] -= this.title;
+      }
+      document.getElementsByClassName("pointsText")[0].innerHTML = scores[0];
+      document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
+      updateOffer();
+    } else if (this.title != "4" && this.title != "5") {
+      var moves = document.getElementsByClassName("moveBlock");
+      for (var j =0; j < moves.length; j++){
+        moves[j].style.backgroundColor = "#44423f";
+      }
+      selectedMove = this.textContent;
+      if(currentPlayer == 1){
+        moveIndex = p1moves.indexOf(selectedMove);
+      }else{
+        moveIndex = p2moves.indexOf(selectedMove);
+      }
+  
+      this.style.backgroundColor = "#687c4d";
     }
-    selectedMove = this.textContent;
-    if(currentPlayer == 1){
-      moveIndex = p1moves.indexOf(selectedMove);
-    }else{
-      moveIndex = p2moves.indexOf(selectedMove);
-    }
-
-    this.style.backgroundColor = "#687c4d";
+    
 });
+}
+
+function makeAllSquaresBlank(){
+  var moves = document.getElementsByClassName("moveBlock");
+      for (var j =0; j < moves.length; j++){
+        moves[j].style.backgroundColor = "#44423f";
+      }
+}
+
+document.getElementById("offer").addEventListener('mousedown', function(){
+  selectedoffer = true;
+});
+
+function updatePlayerText(player){
+  var el = document.getElementById("currentplayer");
+  if (player == 1){
+    el.innerHTML = "Current Player: P1";
+    el.style.color = "red";
+  } else {
+    el.innerHTML = "Current Player: P2";
+    el.style.color = "rgb(0, 174, 255)";
+  }
+}
+
+function changeMoveOrderP1(move){
+  //console.log(move);
+  for (var i=0; i < 5; i++){
+    if (p1moves[i] == move){
+      console.log(scores);
+      var temp = p1moves[i];
+      for (var j = 0; i+j < 4; j++){
+        //moves[i+j].innerHTML = moves[i+j+1].innerHTML;
+        p1moves[i+j] = p1moves[i+j+1];
+      }
+      //moves[4].innerHTML = temp;
+      p1moves[4] = temp;
+      break;
+    }
+  }
+  console.log(p1moves);
+}
+
+function changeMoveOrderP2(move){
+  //console.log(move);
+  for (var i=0; i < 5; i++){
+    if (p2moves[i] == move){
+      console.log(scores);
+      var temp = p2moves[i];
+      for (var j = 0; i+j < 4; j++){
+        p2moves[i+j] = p2moves[i+j+1];
+      }
+      p2moves[4] = temp;
+      break;
+    }
+  }
+  console.log(p2moves);
 }
 
 function mapMoveIndex(x){
@@ -456,6 +616,13 @@ function keypressed(canvas, event){
   }
 }
 
+function updateOffer(){
+  var offerblock = document.getElementById("offer");
+  offerblock.title = p1moves[Math.floor(Math.random()*5)];
+  offerblock.innerHTML = "Offer: "+offerblock.title;
+  selectedoffer = false;
+}
+
 function getCursorPosition(canvas, event) {
   const rect = canvas.getBoundingClientRect();
   const x = event.clientX - rect.left;
@@ -473,6 +640,22 @@ function setUI(){
   document.getElementsByClassName("pointsText")[1].innerHTML = scores[1];
 }
 
+function updateMoveBlocks(){
+  if (currentPlayer == 1){
+    document.getElementById("move1").innerHTML = p1moves[0];
+    document.getElementById("move2").innerHTML = p1moves[1];
+    document.getElementById("move3").innerHTML = p1moves[2];
+    document.getElementById("move4").innerHTML = p1moves[3];
+    document.getElementById("move5").innerHTML = p1moves[4];
+  } else {
+    document.getElementById("move1").innerHTML = p2moves[0];
+    document.getElementById("move2").innerHTML = p2moves[1];
+    document.getElementById("move3").innerHTML = p2moves[2];
+    document.getElementById("move4").innerHTML = p2moves[3];
+    document.getElementById("move5").innerHTML = p2moves[4];
+  }
+}
+
 function GameOver(){
   console.log("Game over");
   if(scores[0] > scores[1]){
@@ -480,6 +663,14 @@ function GameOver(){
   }else{
     console.log("Player two has won");
   }
+}
+
+function DrawCirlce(x, y, radius){
+  ctx.beginPath();
+  console.log(x * squareSize, y * squareSize, radius);
+  ctx.arc(x * squareSize, y * squareSize, radius , 0, 2 * Math.PI, false);
+  ctx.fillStyle = "blue"; 
+  ctx.fill(); 
 }
 
 //set up board
